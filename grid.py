@@ -57,7 +57,9 @@ class Grid:
 
     def fps(self, rate):
         delay = 1.0 / rate
+        frame = 0
         while True:
-            yield
+            yield frame
+            frame += 1
             client.put_pixels(self.pixels)
             time.sleep(delay)
