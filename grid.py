@@ -11,8 +11,9 @@ class Grid:
     W = 50
     H = 8
 
-    def __init__(self):
+    def __init__(self, interp=True):
         self.pixels = [BLACK] * 8 * 64
+        client.set_interpolation(interp)
 
     def __setitem__(self, p, color):
         x, y = p

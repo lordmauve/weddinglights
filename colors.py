@@ -18,3 +18,17 @@ def hsv(hue):
     for _ in range(h // 2):
         vs.insert(0, vs.pop())
     return vs
+
+
+def color_map():
+    """Load a mapping of names to colors."""
+
+    import csv
+    mapping = {}
+    with open('colors.csv') as f:
+        r = csv.reader(f)
+        for row in r:
+            name = row[0]
+            val = tuple(int(c) for c in row[-3:])
+            mapping[name] = val
+    return mapping
