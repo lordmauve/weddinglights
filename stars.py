@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-
 import time
 from itertools import count
 import random
 
-from grid import Grid
-from colors import WHITE, YELLOW
+from lights import Grid, WHITE, YELLOW
 
 
 
