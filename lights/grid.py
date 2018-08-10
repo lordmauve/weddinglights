@@ -1,9 +1,9 @@
-from colors import BLACK
 import random
 import time
 import os
 
-import opc
+from .colors import BLACK
+from . import opc
 
 CLIENT_HOST = os.environ.get('OPC_HOST', 'localhost')
 client = opc.Client(CLIENT_HOST + ':7890')
@@ -14,7 +14,7 @@ class Grid:
     H = 8
 
     def __init__(self, interp=True):
-        self.pixels = [BLACK] * 8 * 64
+        self.pixels = self.last_pixels = [BLACK] * 8 * 64
         client.set_interpolation(interp)
 
     def __setitem__(self, p, color):
@@ -44,15 +44,41 @@ class Grid:
                 yield (x, y), self.pixels[x + y * 64]
 
     def flip(self):
+        self.last_pixels = self.pixels[:]
         client.put_pixels(self.pixels)
 
+    def fade(self, duration=1.0):
+        t = 0
+        DELAY = 0.02
+        values = self.last_pixels[:]
+
+        while t < duration:
+            frac = t / duration
+            for y in range(self.H):
+                for x in range(self.W):
+                    idx = x + y * 64
+                    a = self.last_pixels[idx]
+                    b = self.pixels[idx]
+                    values[idx] = tuple(
+                        frac * b[c] + (1 - frac) * a[c]
+                        for c in range(3)
+                    )
+
+            client.put_pixels(values)
+            time.sleep(DELAY)
+            t += DELAY
+        self.flip()
+
     def rand_x(self):
+        """Return a random position in the x axis."""
         return random.randrange(self.W)
 
     def rand_y(self):
+        """Return a random position in the y axis."""
         return random.randrange(self.H)
 
     def rand_pos(self):
+        """Return a random position in the grid."""
         return (
             random.randrange(self.W),
             random.randrange(self.H)

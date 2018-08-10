@@ -1,9 +1,7 @@
 import time
 import random
 
-from grid import Grid
-from colors import hsv
-
+from lights import Grid, hsv
 
 
 grid = Grid()

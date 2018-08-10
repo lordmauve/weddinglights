@@ -2,8 +2,7 @@ import time
 import random
 import readline
 
-from grid import Grid
-from colors import color_map
+from lights import Grid, color_map
 
 grid = Grid(interp=False)
 
@@ -22,9 +21,10 @@ readline.parse_and_bind("tab: complete")
 readline.set_completer(complete)
 
 
+grid.flip()
 while True:
     while True:
-        name = raw_input("Next color? ")
+        name = input("Next color? ")
         try:
             color = colors[name]
         except KeyError:
@@ -35,4 +35,4 @@ while True:
 
     for p in grid.keys():
         grid[p] = color
-    grid.flip()
+    grid.fade()
