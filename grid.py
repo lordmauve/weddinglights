@@ -1,10 +1,12 @@
 from colors import BLACK
 import random
 import time
+import os
 
 import opc
 
-client = opc.Client('localhost:7890')
+CLIENT_HOST = os.environ.get('OPC_HOST', 'localhost')
+client = opc.Client(CLIENT_HOST + ':7890')
 
 
 class Grid:
