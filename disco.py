@@ -48,7 +48,7 @@ for i, b in enumerate(blocks):
 TEMPO = 100.0
 
 for f in grid.fps(TEMPO / 60.0):
-    off = random.randrange(len(blocks))
+    off += random.randrange(1, len(blocks))
     for i, b in enumerate(blocks):
         b.set(colors[(i + off) % len(colors)])
     if f % 10 == 0:
