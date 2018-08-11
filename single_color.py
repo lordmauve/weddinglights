@@ -1,3 +1,4 @@
+import sys
 import time
 import random
 import readline
@@ -22,15 +23,20 @@ readline.set_completer(complete)
 
 
 grid.flip()
+last = 'black'
 while True:
     while True:
-        name = input("Next color? ")
+        try:
+            name = input(last + "> ")
+        except EOFError:
+            sys.exit(0)
         try:
             color = colors[name]
         except KeyError:
             print("Invalid color")
         else:
             print("Great, {} is {}".format(name, color))
+            last = name
             break
 
     for p in grid.keys():
