@@ -47,6 +47,9 @@ class Grid:
         self.last_pixels = self.pixels[:]
         client.put_pixels(self.pixels)
 
+    def fill(self, color):
+        self.pixels = [color] * len(self.pixels)
+
     def fade(self, duration=1.0):
         t = 0
         DELAY = 0.02

@@ -1,24 +1,14 @@
 import time
 import random
+import math
 
-from lights import Grid, hsv, RED, CYAN, YELLOW, GREEN, PURPLE, BLUE, WHITE
+from lights import (
+    Grid, hsv, RED, CYAN, YELLOW, GREEN, PURPLE, BLUE, WHITE, BLACK,
+    Block, Spotlight
+)
 
 
 grid = Grid(interp=False)
-
-
-class Block:
-    def __init__(self, grid, x, y, w, h):
-        self.grid = grid
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-
-    def set(self, color):
-        for j in range(self.y, self.y + self.h):
-            for i in range(self.x, self.x + self.w):
-                self.grid[i, j] = color
 
 
 def gcd(x, y):
@@ -35,7 +25,15 @@ layout2 = (
     [Block(grid, x, 0, 10, 4) for x in range(0, 50, 10)] +
     [Block(grid, x, 4, 10, 4) for x in range(40, -1, -10)]
 )
-layouts = [layout1, layout2]
+layout3 = [Spotlight(grid, x, 0, 10, 8) for x in range(0, 50, 10)]
+layout4 = (
+    [Spotlight(grid, x, 0, 8, 4) for x in range(0, 50, 10)] +
+    [Spotlight(grid, x, 4, 8, 4) for x in range(36, -1, -10)]
+)
+layouts = [
+    layout1, layout2,
+    layout3, layout4
+]
 
 blocks = random.choice(layouts)
 
@@ -59,9 +57,12 @@ off = 0
 
 maxstep = lcm(len(blocks), len(colors))
 for f in grid.fps(TEMPO / 60.0):
+    if off == 0:
+        grid.fill(BLACK)
     off += random.randrange(1, maxstep)
     for i, b in enumerate(blocks):
         b.set(colors[(i + off) % len(colors)])
     if f % 10 == 0:
         blocks = random.choice(layouts)
         maxstep = lcm(len(blocks), len(colors))
+        off = 0
