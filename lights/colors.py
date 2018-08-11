@@ -4,6 +4,9 @@ WHITE = 255, 255, 255
 GREEN = 0, 255, 0
 BLACK = 0, 0, 0
 YELLOW = 255, 255, 0
+PURPLE = 200, 0, 200
+BLUE = 0, 0, 255
+CYAN = 0, 255, 255
 
 
 def hsv(hue):
