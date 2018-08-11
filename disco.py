@@ -27,6 +27,9 @@ def gcd(x, y):
     return x
 
 
+def lcm(a, b):
+    return a * b / gcd(a, b)
+
 layout1 = [Block(grid, x, 0, 10, 8) for x in range(0, 50, 10)]
 layout2 = (
     [Block(grid, x, 0, 10, 4) for x in range(0, 50, 10)] +
@@ -53,10 +56,12 @@ for i, b in enumerate(blocks):
 TEMPO = 100.0
 
 off = 0
-maxstep = len(blocks) * len(colors) / gcd(len(blocks), len(colors))
+
+maxstep = lcm(len(blocks), len(colors))
 for f in grid.fps(TEMPO / 60.0):
     off += random.randrange(1, maxstep)
     for i, b in enumerate(blocks):
         b.set(colors[(i + off) % len(colors)])
     if f % 10 == 0:
         blocks = random.choice(layouts)
+        maxstep = lcm(len(blocks), len(colors))
