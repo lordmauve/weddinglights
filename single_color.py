@@ -10,6 +10,14 @@ grid = Grid(interp=False)
 
 colors = color_map()
 
+
+if len(sys.argv) > 1:
+    color = colors[sys.argv[1]]
+    grid.fill(color)
+    grid.flip()
+    sys.exit()
+
+
 def complete(name, state):
     matches = [k for k in colors if k.startswith(name)]
     try:
