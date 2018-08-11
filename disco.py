@@ -1,4 +1,5 @@
 import time
+import math
 import random
 
 from lights import Grid, hsv, RED, CYAN, YELLOW, GREEN, PURPLE, BLUE, WHITE
@@ -37,7 +38,6 @@ colors = [
     GREEN,
     PURPLE,
     BLUE,
-    WHITE
 ]
 
 
@@ -47,8 +47,10 @@ for i, b in enumerate(blocks):
 
 TEMPO = 100.0
 
+off = 0
+maxstep = len(blocks) * len(colors) / math.gcd(len(blocks), len(colors))
 for f in grid.fps(TEMPO / 60.0):
-    off += random.randrange(1, len(blocks))
+    off += random.randrange(1, maxstep)
     for i, b in enumerate(blocks):
         b.set(colors[(i + off) % len(colors)])
     if f % 10 == 0:
