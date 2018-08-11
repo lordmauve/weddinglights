@@ -1,5 +1,4 @@
 import time
-import math
 import random
 
 from lights import Grid, hsv, RED, CYAN, YELLOW, GREEN, PURPLE, BLUE, WHITE
@@ -20,6 +19,12 @@ class Block:
         for j in range(self.y, self.y + self.h):
             for i in range(self.x, self.x + self.w):
                 self.grid[i, j] = color
+
+
+def gcd(x, y):
+    while y:
+        x, y = y, x % y
+    return x
 
 
 layout1 = [Block(grid, x, 0, 10, 8) for x in range(0, 50, 10)]
@@ -48,7 +53,7 @@ for i, b in enumerate(blocks):
 TEMPO = 100.0
 
 off = 0
-maxstep = len(blocks) * len(colors) / math.gcd(len(blocks), len(colors))
+maxstep = len(blocks) * len(colors) / gcd(len(blocks), len(colors))
 for f in grid.fps(TEMPO / 60.0):
     off += random.randrange(1, maxstep)
     for i, b in enumerate(blocks):
