@@ -32,7 +32,7 @@ layout4 = (
 )
 layouts = [
     layout1, layout2,
-    layout3, layout4
+#    layout3, layout4
 ]
 
 blocks = random.choice(layouts)
