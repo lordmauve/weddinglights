@@ -48,7 +48,12 @@ class Grid:
         client.put_pixels(self.pixels)
 
     def fill(self, color):
+        """Fill the grid with a single color."""
         self.pixels = [color] * len(self.pixels)
+
+    def clear(self):
+        """Clear the whole grid (set it to black)."""
+        self.pixels = [BLACK] * len(self.pixels)
 
     def fade(self, duration=1.0):
         t = 0
@@ -71,6 +76,18 @@ class Grid:
             time.sleep(DELAY)
             t += DELAY
         self.flip()
+
+    def darken(self, factor=0.6):
+        """Darken all pixels on the grid by a multiple."""
+        if not (0 <= factor <= 1):
+            raise ValueError('Cannot darken by factor of {}'.format(factor))
+
+        factor = round(255 * factor)
+        for y in range(self.H):
+            for x in range(self.W):
+                idx = x + y * 64
+                v = self.pixels[idx]
+                self.pixels[idx] = tuple((c * factor) // 255 for c in v)
 
     def rand_x(self):
         """Return a random position in the x axis."""
