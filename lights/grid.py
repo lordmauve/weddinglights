@@ -6,7 +6,8 @@ from .colors import BLACK
 from . import opc
 
 CLIENT_HOST = os.environ.get('OPC_HOST', 'localhost')
-client = opc.Client(CLIENT_HOST + ':7890')
+CLIENT_PORT = os.environ.get('OPC_PORT', '7890')
+client = opc.Client(CLIENT_HOST + ':' + CLIENT_PORT)
 
 
 class Grid:

@@ -42,8 +42,15 @@ def serve():
 
 Thread(target=serve, daemon=True).start()
 
+lastpixels = pixels
 
 def draw():
+    global lastpixels
+
+    if pixels is lastpixels:
+        return
+
+    lastpixels = pixels
     screen.clear()
     for i, p in enumerate(pixels):
         y, x = divmod(i, 64)
@@ -52,6 +59,7 @@ def draw():
         r, g, b = p
         intensity = max(p)
 
+        x = 49 - x
         cx = x * 15 + 20
         cy = y * 20 + 20
         screen.draw.filled_circle(
@@ -76,3 +84,5 @@ def draw():
 def update():
     pass
 
+import pygame
+pygame.mixer.quit()
