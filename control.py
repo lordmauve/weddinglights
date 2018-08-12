@@ -6,7 +6,7 @@ from pygame.locals import QUIT, JOYBUTTONDOWN, JOYAXISMOTION
 from pygame import event
 from pygame import joystick
 
-pygame.init()
+pygame.display.init()
 joystick.init()
 #pygame.display.set_mode((1, 1))
 
