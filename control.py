@@ -15,11 +15,13 @@ if joystick.get_count() < 1:
 
 
 scripts = [
-    'stars',
     'rainbow',
     'disco',
     'sparks',
     'flag',
+    'hearts',
+    'text',
+    'stars',
 ]
 
 
