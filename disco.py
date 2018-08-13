@@ -36,6 +36,7 @@ layouts = [
 ]
 
 blocks = random.choice(layouts)
+random.shuffle(blocks)
 
 colors = [
     RED,
@@ -55,14 +56,14 @@ TEMPO = 100.0
 
 off = 0
 
-maxstep = lcm(len(blocks), len(colors))
 for f in grid.fps(TEMPO / 60.0):
     if off == 0:
         grid.fill(BLACK)
-    off += random.randrange(1, maxstep)
+    off += 1
     for i, b in enumerate(blocks):
         b.set(colors[(i + off) % len(colors)])
     if f % 10 == 0:
         blocks = random.choice(layouts)
+        random.shuffle(blocks)
         maxstep = lcm(len(blocks), len(colors))
         off = 0
