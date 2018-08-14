@@ -80,15 +80,25 @@ class Grid:
 
     def darken(self, factor=0.6):
         """Darken all pixels on the grid by a multiple."""
-        if not (0 <= factor <= 1):
-            raise ValueError('Cannot darken by factor of {}'.format(factor))
 
-        factor = round(255 * factor)
+        if isinstance(factor, tuple):
+            if not all(0 <= f <= 1 for f in factor):
+                raise ValueError(
+                    'Cannot darken by factor of {}'.format(factor)
+                )
+            factor = tuple(round(255 * f) for f in factor)
+        else:
+            if not 0 <= factor <= 1:
+                raise ValueError(
+                    'Cannot darken by factor of {}'.format(factor)
+                )
+            factor = (round(255 * factor),) * 3
         for y in range(self.H):
             for x in range(self.W):
                 idx = x + y * 64
                 v = self.pixels[idx]
-                self.pixels[idx] = tuple((c * factor) // 255 for c in v)
+                newv = tuple((c * f) // 255 for c, f in zip(v, factor))
+                self.pixels[idx] = newv
 
     def rand_x(self):
         """Return a random position in the x axis."""
