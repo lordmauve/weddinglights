@@ -1,7 +1,8 @@
 import time
 import random
-import math
+from itertools import count
 
+from btrack import track_beats
 from lights import (
     Grid, hsv, RED, CYAN, YELLOW, GREEN, PURPLE, BLUE, WHITE, BLACK,
     Block, Spotlight
@@ -56,14 +57,18 @@ TEMPO = 100.0
 
 off = 0
 
-for f in grid.fps(TEMPO / 60.0):
-    if off == 0:
-        grid.fill(BLACK)
-    off += 1
-    for i, b in enumerate(blocks):
-        b.set(colors[(i + off) % len(colors)])
-    if f % 10 == 0:
-        blocks = random.choice(layouts)
-        random.shuffle(blocks)
-        maxstep = lcm(len(blocks), len(colors))
-        off = 0
+with track_beats() as tracker:
+    for f in count():
+        if off == 0:
+            grid.fill(BLACK)
+        off += 1
+        for i, b in enumerate(blocks):
+            b.set(colors[(i + off) % len(colors)])
+        if f % 10 == 0:
+            blocks = random.choice(layouts)
+            random.shuffle(blocks)
+            maxstep = lcm(len(blocks), len(colors))
+            off = 0
+        while not tracker.has_beats():
+            time.sleep(0.01)
+        grid.flip()
