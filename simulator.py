@@ -1,14 +1,31 @@
+import os
+import sys
 from lights.colors import BLACK
 import struct
 from socketserver import ThreadingTCPServer, StreamRequestHandler
 from threading import Thread
 
 
+STRIDEX = 15
+PIXELSH = 8
+
+
+if os.environ.get('MODE') == 'hat':
+    PIXELSW = 8
+    PORT = 7891
+    STRIDEY = 15
+else:
+    PIXELSW = 50
+    PORT = 7890
+    STRIDEY = 30
+
+
+
 pixels = [BLACK] * 8 * 64
 
 TITLE = "Wedding lights simulator"
-WIDTH = 15 * 50 + 20
-HEIGHT = 20 * 8 + 20
+WIDTH = 15 * (PIXELSW - 1) + 40
+HEIGHT = STRIDEY * (PIXELSH - 1) + 40
 
 
 MSG_HEADER = struct.Struct('>BBH')
@@ -35,7 +52,7 @@ class Handler(StreamRequestHandler):
                 print("Unsupported command %d" % command)
 
 def serve():
-    s = ThreadingTCPServer(('0.0.0.0', 7890), Handler)
+    s = ThreadingTCPServer(('0.0.0.0', PORT), Handler)
     s.daemon_threads = True
     s.serve_forever()
 
@@ -54,14 +71,15 @@ def draw():
     screen.clear()
     for i, p in enumerate(pixels):
         y, x = divmod(i, 64)
-        if x >= 50:
+        if x >= PIXELSW:
             continue
+        y = PIXELSH - y - 1
         r, g, b = p
         intensity = max(p)
 
-        x = 49 - x
-        cx = x * 15 + 20
-        cy = y * 20 + 20
+        x = PIXELSW - x - 1
+        cx = x * STRIDEX + 20
+        cy = y * STRIDEY + 20
         screen.draw.filled_circle(
             pos=(cx, cy),
             radius=4,
