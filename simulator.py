@@ -1,7 +1,8 @@
 import os
-import sys
 from lights.colors import BLACK
 import struct
+import pygame.image
+from pygame import Surface
 from socketserver import ThreadingTCPServer, StreamRequestHandler
 from threading import Thread
 
@@ -101,6 +102,22 @@ def draw():
 
 def update():
     pass
+
+
+def on_key_down(key):
+    if key == keys.F12:
+        s = Surface((PIXELSW, PIXELSH), depth=24)
+        for i, p in enumerate(pixels):
+            y, x = divmod(i, 64)
+            if x >= PIXELSW:
+                continue
+            y = PIXELSH - y - 1
+            x = PIXELSW - x - 1
+            s.set_at((x, y), p)
+        pygame.image.save(s, 'grab.png')
+
+
+
 
 import pygame
 pygame.mixer.quit()
