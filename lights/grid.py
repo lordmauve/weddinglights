@@ -1,22 +1,24 @@
 import random
 import time
 import os
+from pygame import Surface
+from pygame import surfarray
 
 from .colors import BLACK
 from . import opc
-
-CLIENT_HOST = os.environ.get('OPC_HOST', 'localhost')
-CLIENT_PORT = os.environ.get('OPC_PORT', '7890')
-client = opc.Client(CLIENT_HOST + ':' + CLIENT_PORT)
 
 
 class Grid:
     W = 50
     H = 8
 
-    def __init__(self, interp=True):
+    def __init__(self, interp=True, port=None):
         self.pixels = self.last_pixels = [BLACK] * 8 * 64
-        client.set_interpolation(interp)
+
+        CLIENT_HOST = os.environ.get('OPC_HOST', 'localhost')
+        CLIENT_PORT = str(port) if port else os.environ.get('OPC_PORT', '7890')
+        self.client = opc.Client(CLIENT_HOST + ':' + CLIENT_PORT)
+        self.client.set_interpolation(interp)
 
     def __setitem__(self, p, color):
         x, y = p
@@ -46,7 +48,7 @@ class Grid:
 
     def flip(self):
         self.last_pixels = self.pixels[:]
-        client.put_pixels(self.pixels)
+        self.client.put_pixels(self.pixels)
 
     def fill(self, color):
         """Fill the grid with a single color."""
@@ -73,7 +75,7 @@ class Grid:
                         for c in range(3)
                     )
 
-            client.put_pixels(values)
+            self.client.put_pixels(values)
             time.sleep(DELAY)
             t += DELAY
         self.flip()
@@ -100,6 +102,15 @@ class Grid:
                 newv = tuple((c * f) // 255 for c, f in zip(v, factor))
                 self.pixels[idx] = newv
 
+    def surface(self):
+        return Surface((64, 8), 0, 24)
+
+    def blitsurf(self, surf):
+        """Blit a Pygame Surface to this grid."""
+        buf = surfarray.array3d(surf)
+        buf = buf.transpose([1, 0, 2])[::-1, ::-1, :]
+        self.pixels = buf.reshape(64 * 8, 3)
+
     def rand_x(self):
         """Return a random position in the x axis."""
         return random.randrange(self.W)
@@ -121,5 +132,5 @@ class Grid:
         while True:
             yield frame
             frame += 1
-            client.put_pixels(self.pixels)
+            self.client.put_pixels(self.pixels)
             time.sleep(delay)
