@@ -10,9 +10,13 @@ class Block:
         self.h = h
 
     def keys(self):
-        for j in range(self.y, self.y + self.h):
-            for i in range(self.x, self.x + self.w):
+        for j in range(max(self.y, 0), min(self.y + self.h, self.grid.H)):
+            for i in range(max(self.x, 0), min(self.x + self.w, self.grid.W)):
                 yield i, j
+
+    def items(self):
+        for k in self.keys():
+            yield k, self.grid[k]
 
     def set(self, color):
         for pos in self.keys():
@@ -20,13 +24,18 @@ class Block:
 
 
 class Spotlight(Block):
-    def set(self, color):
-        cx = self.x + 0.5 * self.w
-        cy = self.y + 0.5 * self.h
-        for x, y in super().keys():
-            dx = (x - cx) / (self.w / 2)
-            dy = (y - cy) / (self.h / 2)
+    intensity = 1
 
-            dist = math.sqrt(dx * dx + dy * dy)
+    def set(self, color):
+        hw = self.w * 0.5
+        hh = self.h * 0.5
+        cx = self.x + hw - 0.5
+        cy = self.y + hh - 0.5
+        for (x, y), prev in super().items():
+            dx = (x - cx) / hw
+            dy = (y - cy) / hh
+
+            dist = math.sqrt(dx * dx + dy * dy) / self.intensity
             frac = max(0, 1.0 - dist * dist * dist)
-            self.grid[x, y] = tuple(c * frac for c in color)
+
+            self.grid[x, y] = tuple(min(255, p + c * frac) for p, c in zip(prev, color))
