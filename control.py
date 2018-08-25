@@ -26,6 +26,7 @@ scripts = [
     'rainbow',
     'disco',
     'waves',
+    'spots',
     'sparks',
     'flag',
     'hearts',
@@ -71,37 +72,46 @@ def stop_and_clear_all():
 
 def move(dir):
     """Move the selection, in a given direction."""
-    global current, touch
+    global current
     assert dir in (-1, 1)
-    touch = time.time()
-    current = (current + dir) % len(scripts)
+    current = current + dir
 
 
 def activate():
     """Activate the selected script."""
-    global touch
-    touch = time.time()
+    global last_current
     start(scripts[current])
+    last_current = current
 
 
 def update():
-    global pos
-    if time.time() - touch > 5:
-        grid.darken()
+    global pos, current
+    since_touch = time.time() - touch
+
+    if since_touch > 7:
+        current = last_current
+        pos = last_current * 8
+    elif since_touch > 5:
+        grid.darken(0.9)
     else:
         left_icon = icons[int(pos // 8) % len(icons)]
         right_icon = icons[int(pos // 8 + 1) % len(icons)]
-        target_pos = current * 8
-        pos = pos * 0.6 + target_pos * 0.4
 
-        edge = round((pos // 8 * 8) + 56 - pos)
+        edge = pos // 8 * 8 + 56 - pos
         screen.blit(left_icon, (edge, 0))
-        screen.blit(right_icon, (edge + 8, 0))
+        if pos % 8:
+            screen.blit(right_icon, (edge + 8, 0))
         grid.blitsurf(screen)
+
+        target_pos = current * 8
+        if abs(target_pos - pos) < 0.5:
+            pos = target_pos
+        else:
+            pos = pos * 0.6 + target_pos * 0.4
 
 
 touch = time.time()
-pos = current = 0
+pos = current = last_current = 0
 atexit.register(stop_and_clear_all)
 start(scripts[current])
 
@@ -114,15 +124,18 @@ for f in grid.fps(20):
         if ev.type == QUIT:
             sys.exit(0)
         elif ev.type == JOYAXISMOTION:
+            touch = time.time()
             if ev.axis == 0:
                 pos = round(ev.value)
                 move(dir)
         elif ev.type == JOYBUTTONDOWN:
+            touch = time.time()
             if ev.button == 1:
                 stop_and_clear()
             elif ev.button == 2:
                 activate()
         elif ev.type == KEYDOWN:
+            touch = time.time()
             if ev.key == pygame.K_LEFT:
                 move(-1)
             elif ev.key == pygame.K_RIGHT:
