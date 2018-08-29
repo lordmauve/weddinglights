@@ -45,6 +45,7 @@ scripts = [
 #    'text',
     'stars',
     'strobe',
+    'meter',
 ]
 
 icons = [
