@@ -86,7 +86,9 @@ def stop_and_clear_all():
 def move(dir):
     """Move the selection, in a given direction."""
     global current, touchtype
-    assert dir in (-1, 1)
+    if dir == 0:
+        return
+    assert dir in (-1, 1), "{} is not a valid direction".format(dir)
     current = current + dir
     touchtype = 'script'
 
@@ -164,11 +166,11 @@ for f in grid.fps(20):
         elif ev.type == JOYAXISMOTION:
             touch = time.time()
             if ev.axis == 0:
-                pos = round(ev.value)
+                dir = round(ev.value)
                 move(dir)
             elif ev.axis == 1:
-                pos = round(ev.value)
-                vol_incr(dir * 5)
+                dir = round(ev.value)
+                vol_incr(dir * -5)
         elif ev.type == JOYBUTTONDOWN:
             touch = time.time()
             if ev.button == 1:

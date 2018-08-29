@@ -29,6 +29,6 @@ with track_beats() as tracker:
         waves = newwaves
 
         if tracker.has_beats():
-            intensity = min(tracker.vol, 0.1) / 0.05
+            intensity = min(tracker.vol, 0.03) / 0.03
             for y in range(grid.H):
                 waves.append((0, y, random.uniform(0.5, 0.55), intensity))

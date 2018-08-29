@@ -41,8 +41,8 @@ def run_sparks():
                 newsparks.append(s)
         sparks = newsparks
 
-        if random.random() > 0.7:
-            intensity = random.random() ** 2
+        if random.random() > 0.8:
+            intensity = random.random()
             if intensity < 0.5:
                 color = tuple(round(c * (intensity ** 1.2 * 1.5 + 0.25)) for c in PINK)
             else:

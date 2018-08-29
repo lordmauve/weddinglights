@@ -27,7 +27,7 @@ with track_beats() as tracker:
         spot.intensity *= 0.95
 
         if tracker.has_beats():
-            intensity = min(tracker.vol, 0.1) / 0.1
+            intensity = min(tracker.vol, 0.03) / 0.03
             spot.intensity = intensity
         spot.set(WHITE)
         if spot.x > 42:

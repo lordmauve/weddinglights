@@ -16,9 +16,10 @@ vols = deque([0] * 50, maxlen=50)
 
 with track_beats() as tracker:
     for f in grid.fps(30):
-        vols.append(min(tracker.vol, 0.1) / 0.1)
+        vols.append(min(tracker.vol, 0.03) / 0.03)
         grid.clear()
         for x, v in enumerate(vols):
+            x = 49 - x
             whole, frac = divmod(v, 0.25)
             frac /= 0.25
             whole = int(whole)
