@@ -8,6 +8,8 @@ from pygame.locals import QUIT, JOYBUTTONDOWN, JOYAXISMOTION, KEYDOWN
 from pygame import event
 from pygame import joystick
 
+import alsaaudio
+
 from lights import Grid
 
 
@@ -21,6 +23,16 @@ screen = grid.surface()
 #if joystick.get_count() < 1:
 #    sys.exit('No joysticks detected')
 
+
+
+card = alsaaudio.cards().index('Device')
+mixer = alsaaudio.Mixer('Mic', cardindex=card)
+
+
+def getvolume():
+    return mixer.getvolume(alsaaudio.PCM_CAPTURE)[0]
+
+volume = getvolume()
 
 scripts = [
     'rainbow',
@@ -72,15 +84,16 @@ def stop_and_clear_all():
 
 def move(dir):
     """Move the selection, in a given direction."""
-    global current
+    global current, touchtype
     assert dir in (-1, 1)
     current = current + dir
+    touchtype = 'script'
 
 
 def activate():
     """Activate the selected script."""
     global last_current
-    start(scripts[current])
+    start(scripts[current % len(scripts)])
     last_current = current
 
 
@@ -93,7 +106,7 @@ def update():
         pos = last_current * 8
     elif since_touch > 5:
         grid.darken(0.9)
-    else:
+    elif touchtype == 'script':
         left_icon = icons[int(pos // 8) % len(icons)]
         right_icon = icons[int(pos // 8 + 1) % len(icons)]
 
@@ -108,9 +121,33 @@ def update():
             pos = target_pos
         else:
             pos = pos * 0.6 + target_pos * 0.4
+    elif touchtype == 'volume':
+        STEP = 100 / 9
+        bars, rem = divmod(volume, STEP)
+        bars = int(bars)
+        grid.clear()
+        for b in range(min(bars, 8)):
+            if b == bars - 1:
+                col = int(rem / STEP * 255)
+            else:
+                col = 255
+            for y in range(b + 1):
+                grid[7 - b, y] = 0, col, 0
+
+
+def vol_incr(delta):
+    """Change the recording volume on the sound card."""
+    global volume, touchtype
+    cvol = getvolume()
+    newvol = max(0, min(100, cvol + delta))
+    mixer.setrec(newvol != 0)
+    mixer.setvolume(newvol)
+    volume = newvol
+    touchtype = 'volume'
 
 
 touch = time.time()
+touchtype = None
 pos = current = last_current = 0
 atexit.register(stop_and_clear_all)
 start(scripts[current])
@@ -128,6 +165,9 @@ for f in grid.fps(20):
             if ev.axis == 0:
                 pos = round(ev.value)
                 move(dir)
+            elif ev.axis == 1:
+                pos = round(ev.value)
+                vol_incr(dir * 5)
         elif ev.type == JOYBUTTONDOWN:
             touch = time.time()
             if ev.button == 1:
@@ -140,6 +180,10 @@ for f in grid.fps(20):
                 move(-1)
             elif ev.key == pygame.K_RIGHT:
                 move(1)
+            elif ev.key == pygame.K_UP:
+                vol_incr(5)
+            elif ev.key == pygame.K_DOWN:
+                vol_incr(-5)
             elif ev.key == pygame.K_RETURN:
                 activate()
             elif ev.key == pygame.K_ESCAPE:
